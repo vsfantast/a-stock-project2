@@ -1,0 +1,5 @@
+- [kendu 投资画像](user_profile.md) — 初学 · 1万 · 巴菲特框架 · PDF报告 · 主板
+- [五道防线](five_defenses.md) — 每日作战节奏：8:52早盘→9:32开盘→11:32午间→14:42收盘→周六9:17周末
+- [教学方式](teaching_approach.md) — 分析同步教学 · 不推高风险 · 每建议必带止损
+- [学习路线](learning_path.md) — 三阶段：不亏钱→建框架→独立决策
+- [项目状态](project_status.md) — a-stock-master V2.5 · 腾讯云香港 · 企微已上线

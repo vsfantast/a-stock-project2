@@ -1,0 +1,65 @@
+# cc-connect 服务器配置 — A股机器人
+language = "zh"
+
+[log]
+level = "info"
+
+[display]
+thinking_messages = false
+tool_messages = false
+
+[stream_preview]
+enabled = false
+
+# ====== 项目：A股分析机器人 ======
+[[projects]]
+name = "a-stock-bot"
+admin_from = "*"
+show_context_indicator = false
+reply_footer = false
+
+[projects.agent]
+type = "claudecode"
+
+[projects.agent.options]
+work_dir = "/home/ubuntu/a-stock-project"
+mode = "bypassPermissions"
+
+# ====== 飞书平台 ======
+[[projects.platforms]]
+type = "feishu"
+
+[projects.platforms.options]
+app_id = "cli_aa83cbd9dbb81bd4"
+app_secret = "2g9TuP1IETBULKURDvsYwbVpFJ0ji6nz"
+enable_feishu_card = false
+allow_from = "*"
+reaction_emoji = "none"
+done_emoji = "none"
+progress_style = "compact"
+
+# ====== 企业微信平台（直连，无需隧道！）======
+[[projects.platforms]]
+type = "wecom"
+
+[projects.platforms.options]
+corp_id = "ww7f7613bc58ed2d64"
+corp_secret = "Vgu6IoWrpliNoUzB4E8ZehdReQ-LFi-ePdWnfR7G7g8"
+agent_id = "1000002"
+callback_token = "stockmaster2024"
+callback_aes_key = "wK05CtBjfbCviBpi8Fqbt3CHckdVWx4hXnHtpsO9cor"
+port = "8080"
+callback_path = "/wecom/callback"
+enable_markdown = false
+allow_from = "*"
+
+# ====== 微信个人平台 ======
+[[projects.platforms]]
+type = "weixin"
+
+[projects.platforms.options]
+token = "1130a6b35d34@im.bot:060000666d92a66a06f738d5c6b01346fd2696"
+base_url = "https://ilinkai.weixin.qq.com"
+account_id = "1130a6b35d34@im.bot"
+allow_from = "*"
+
