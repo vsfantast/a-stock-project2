@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日立中央空调 · 样板间海报</title>
+<style>
+  :root {
+    --hitachi-black: #1a1a1c;
+    --hitachi-dark: #242427;
+    --hitachi-charcoal: #2d2d31;
+    --hitachi-gray: #8a8a8f;
+    --hitachi-silver: #c4c4c9;
+    --hitachi-light: #e8e8ec;
+    --hitachi-red: #e62e1f;
+    --hitachi-orange: #f05a28;
+    --hitachi-gold: #c8964a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #0d0d0e;
+    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  }
+
+  .poster {
+    width: 750px;
+    height: 1334px;
+    background: var(--hitachi-black);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Subtle grid background ── */
+  .bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Diagonal tech lines ── */
+  .tech-lines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.06;
+  }
+  .tech-line {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, rgba(230,46,31,0.4), transparent);
+    height: 1px;
+    width: 100%;
+  }
+
+  /* ── Glowing orbs ── */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb-red {
+    width: 340px;
+    height: 340px;
+    background: radial-gradient(circle, rgba(230,46,31,0.12), transparent);
+    top: -100px;
+    right: -120px;
+  }
+  .orb-orange {
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(240,90,40,0.1), transparent);
+    bottom: 180px;
+    left: -80px;
+  }
+  .orb-blue {
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(100,140,200,0.06), transparent);
+    top: 50%;
+    right: -40px;
+  }
+
+  /* ── Header bar ── */
+  .header {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 48px 48px 0;
+  }
+  .hitachi-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-mark {
+    width: 64px;
+    height: 64px;
+    background: var(--hitachi-black);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .logo-mark-inner {
+    width: 48px;
+    height: 48px;
+    position: relative;
+  }
+  /* stylized heatsink / blades */
+  .logo-blade {
+    position: absolute;
+    background: linear-gradient(180deg, var(--hitachi-silver), var(--hitachi-gray));
+    border-radius: 2px;
+  }
+  .logo-blade:nth-child(1) { width: 6px; height: 48px; left: 6px; }
+  .logo-blade:nth-child(2) { width: 6px; height: 42px; left: 14px; top: 3px; }
+  .logo-blade:nth-child(3) { width: 6px; height: 48px; left: 22px; }
+  .logo-blade:nth-child(4) { width: 6px; height: 36px; left: 30px; top: 6px; }
+  .logo-blade:nth-child(5) { width: 6px; height: 48px; left: 38px; }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+  .brand-zh { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 4px; }
+  .brand-en { font-size: 10px; font-weight: 400; color: var(--hitachi-gray); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+
+  .header-tag {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 12px;
+    color: var(--hitachi-silver);
+    letter-spacing: 3px;
+  }
+
+  /* ── Main hero area ── */
+  .hero {
+    position: relative;
+    z-index: 3;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 48px;
+  }
+
+  /* Showroom illustration area */
+  .showroom-visual {
+    position: relative;
+    margin-top: 48px;
+    height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Abstract 3D room representation */
+  .room-perspective {
+    position: relative;
+    width: 600px;
+    height: 360px;
+  }
+
+  /* Ceiling cassette unit */
+  .cassette-unit {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    height: 100px;
+    background: linear-gradient(180deg, #3a3a40, #2a2a30);
+    border-radius: 12px 12px 4px 4px;
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .cassette-grille {
+    display: flex;
+    gap: 8px;
+  }
+  .grille-line {
+    width: 3px;
+    height: 50px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+  }
+  .cassette-indicator {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    width: 4px;
+    height: 4px;
+    background: var(--hitachi-red);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--hitachi-red);
+  }
+
+  /* Room outline - perspective floor & walls */
+  .room-walls {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 560px;
+    height: 240px;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-bottom: none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.04) 100%);
+  }
+  .room-floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(180deg, transparent, rgba(230,46,31,0.03));
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .floor-pattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(45deg, rgba(255,255,255,0.015) 25%, transparent 25%),
+      linear-gradient(-45deg, rgba(255,255,255,0.015) 25%, transparent 25%);
+    background-size: 30px 30px;
+  }
+
+  /* Floating data/tech elements */
+  .data-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(230,46,31,0.2);
+    pointer-events: none;
+  }
+  .data-ring-1 {
+    width: 100px; height: 100px;
+    top: 60px; left: 80px;
+    animation: pulse-ring 3s ease-in-out infinite;
+  }
+  .data-ring-2 {
+    width: 60px; height: 60px;
+    top: 80px; right: 90px;
+    border-color: rgba(255,255,255,0.08);
+    animation: pulse-ring 3s ease-in-out 1s infinite;
+  }
+
+  @keyframes pulse-ring {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.15); }
+  }
+
+  /* Temperature display */
+  .temp-display {
+    position: absolute;
+    top: 160px;
+    right: 70px;
+    text-align: right;
+    z-index: 4;
+  }
+  .temp-value {
+    font-size: 72px;
+    font-weight: 200;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -4px;
+  }
+  .temp-unit {
+    font-size: 24px;
+    color: var(--hitachi-gray);
+    font-weight: 300;
+  }
+  .temp-label {
+    font-size: 11px;
+    color: var(--hitachi-red);
+    letter-spacing: 4px;
+    margin-top: 4px;
+  }
+
+  /* Air flow particles */
+  .airflow {
+    position: absolute;
+  }
+  .air-particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--hitachi-silver);
+    border-radius: 50%;
+    opacity: 0;
+    animation: float-up 2.5s ease-in-out infinite;
+  }
+  .air-particle:nth-child(1) { left: 240px; top: 140px; animation-delay: 0s; }
+  .air-particle:nth-child(2) { left: 260px; top: 160px; animation-delay: 0.4s; }
+  .air-particle:nth-child(3) { left: 280px; top: 130px; animation-delay: 0.8s; }
+  .air-particle:nth-child(4) { left: 300px; top: 150px; animation-delay: 1.2s; }
+  .air-particle:nth-child(5) { left: 250px; top: 170px; animation-delay: 1.6s; }
+  .air-particle:nth-child(6) { left: 320px; top: 140px; animation-delay: 2.0s; }
+
+  @keyframes float-up {
+    0% { opacity: 0; transform: translateY(0) scale(1); }
+    30% { opacity: 0.7; }
+    70% { opacity: 0.2; }
+    100% { opacity: 0; transform: translateY(-60px) scale(0.3); }
+  }
+
+  /* ── Feature icons row ── */
+  .features-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 32px;
+    position: relative;
+    z-index: 3;
+  }
+  .feature-item {
+    flex: 1;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 24px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(230,46,31,0.4), transparent);
+  }
+  .feature-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .feature-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  .feature-desc {
+    font-size: 10px;
+    color: var(--hitachi-gray);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Bottom section ── */
+  .bottom-section {
+    position: relative;
+    z-index: 3;
+    padding: 32px 48px 48px;
+  }
+
+  .main-title-block {
+    margin-bottom: 24px;
+  }
+  .title-line-1 {
+    font-size: 40px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 6px;
+    line-height: 1.1;
+  }
+  .title-line-2 {
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--hitachi-silver);
+    letter-spacing: 8px;
+    margin-top: 8px;
+  }
+  .title-accent {
+    color: var(--hitachi-red);
+  }
+
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--hitachi-red), transparent);
+    margin: 20px 0;
+  }
+
+  .specs-row {
+    display: flex;
+    gap: 32px;
+    margin-top: 16px;
+  }
+  .spec {
+    text-align: left;
+  }
+  .spec-val {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+  }
+  .spec-unit {
+    font-size: 12px;
+    color: var(--hitachi-gray);
+    font-weight: 400;
+  }
+  .spec-label {
+    font-size: 10px;
+    color: var(--hitachi-gray);
+    letter-spacing: 2px;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 48px 48px;
+  }
+  .footer-left {
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 1px;
+    line-height: 1.8;
+  }
+  .footer-right {
+    text-align: right;
+  }
+  .footer-tagline {
+    font-size: 11px;
+    color: var(--hitachi-red);
+    letter-spacing: 3px;
+  }
+  .footer-sub {
+    font-size: 9px;
+    color: var(--hitachi-gray);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* ── Corner accents ── */
+  .corner-accent {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .corner-tl {
+    top: 32px;
+    left: 32px;
+    width: 40px;
+    height: 40px;
+    border-top: 1px solid rgba(230,46,31,0.3);
+    border-left: 1px solid rgba(230,46,31,0.3);
+  }
+  .corner-br {
+    bottom: 32px;
+    right: 32px;
+    width: 40px;
+    height: 40px;
+    border-bottom: 1px solid rgba(230,46,31,0.15);
+    border-right: 1px solid rgba(230,46,31,0.15);
+  }
+</style>
+</head>
+<body>
+
+<div class="poster">
+  <!-- Background layers -->
+  <div class="bg-grid"></div>
+  <div class="tech-lines">
+    <div class="tech-line" style="top:15%;left:-10%;transform:rotate(-12deg);width:120%"></div>
+    <div class="tech-line" style="top:38%;left:-10%;transform:rotate(-8deg);width:120%"></div>
+    <div class="tech-line" style="top:62%;left:-10%;transform:rotate(-15deg);width:120%"></div>
+    <div class="tech-line" style="top:74%;left:-10%;transform:rotate(-10deg);width:120%"></div>
+  </div>
+
+  <div class="orb orb-red"></div>
+  <div class="orb orb-orange"></div>
+  <div class="orb orb-blue"></div>
+
+  <div class="corner-accent corner-tl"></div>
+  <div class="corner-accent corner-br"></div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="hitachi-logo">
+      <div class="logo-mark">
+        <div class="logo-mark-inner">
+          <div class="logo-blade"></div>
+          <div class="logo-blade"></div>
+          <div class="logo-blade"></div>
+          <div class="logo-blade"></div>
+          <div class="logo-blade"></div>
+        </div>
+      </div>
+      <div class="brand-text">
+        <span class="brand-zh">日立</span>
+        <span class="brand-en">HITACHI</span>
+      </div>
+    </div>
+    <div class="header-tag">样 板 间</div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <!-- Showroom visual -->
+    <div class="showroom-visual">
+      <div class="room-perspective">
+        <!-- Decorative rings -->
+        <div class="data-ring data-ring-1"></div>
+        <div class="data-ring data-ring-2"></div>
+
+        <!-- Ceiling cassette unit -->
+        <div class="cassette-unit">
+          <div class="cassette-grille">
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+            <div class="grille-line"></div>
+          </div>
+          <div class="cassette-indicator"></div>
+        </div>
+
+        <!-- Room -->
+        <div class="room-walls">
+          <div class="room-floor">
+            <div class="floor-pattern"></div>
+          </div>
+        </div>
+
+        <!-- Air particles -->
+        <div class="airflow">
+          <div class="air-particle"></div>
+          <div class="air-particle"></div>
+          <div class="air-particle"></div>
+          <div class="air-particle"></div>
+          <div class="air-particle"></div>
+          <div class="air-particle"></div>
+        </div>
+
+        <!-- Temp display -->
+        <div class="temp-display">
+          <div class="temp-value">26<span class="temp-unit">°C</span></div>
+          <div class="temp-label">恒 温 · 恒 湿</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature icons -->
+    <div class="features-row">
+      <div class="feature-item">
+        <span class="feature-icon">🌀</span>
+        <div class="feature-title">3D立体气流</div>
+        <div class="feature-desc">无死角覆盖</div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">🔇</span>
+        <div class="feature-title">20dB(A)</div>
+        <div class="feature-desc">超静音运行</div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">💧</span>
+        <div class="feature-title">除菌自清洁</div>
+        <div class="feature-desc">纳米水离子</div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">⚡</span>
+        <div class="feature-title">一级能效</div>
+        <div class="feature-desc">变频节能</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="bottom-section">
+    <div class="main-title-block">
+      <div class="title-line-1">日立<span class="title-accent">·</span>中央空调</div>
+      <div class="title-line-2">智 能 生 态 样 板 间</div>
+    </div>
+    <div class="divider"></div>
+    <div class="specs-row">
+      <div class="spec">
+        <span class="spec-val">99.9<span class="spec-unit">%</span></span>
+        <div class="spec-label">除菌率</div>
+      </div>
+      <div class="spec">
+        <span class="spec-val">±0.5<span class="spec-unit">°C</span></span>
+        <div class="spec-label">温控精度</div>
+      </div>
+      <div class="spec">
+        <span class="spec-val">IPLV<span class="spec-unit">7.6</span></span>
+        <div class="spec-label">综合能效</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-left">
+      HITACHI CENTRAL AIR CONDITIONING<br>
+      日立中央空调 · 科技成就舒适生活
+    </div>
+    <div class="footer-right">
+      <div class="footer-tagline">Inspire the Next</div>
+      <div class="footer-sub">HITACHI 1910-2026</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,166 @@
+/* Stock Deep Analysis Report Template — extends base.css */
+@import url('base.css');
+
+/* ── Cover Page ── */
+.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 120px 0 80px 0;
+  page-break-after: always;
+}
+
+.cover .stock-code {
+  font-size: 14pt;
+  color: #94a3b8;
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+
+.cover .stock-name {
+  font-size: 28pt;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+  letter-spacing: 4px;
+}
+
+.cover .report-type {
+  font-size: 12pt;
+  color: #b8860b;
+  letter-spacing: 2px;
+  margin-top: 20px;
+  padding: 8px 24px;
+  border: 1.5px solid #b8860b;
+  display: inline-block;
+}
+
+.cover .report-meta {
+  margin-top: 40px;
+  font-size: 9pt;
+  color: #94a3b8;
+  line-height: 2;
+}
+
+.cover .divider-line {
+  width: 60px;
+  height: 2px;
+  background: #b8860b;
+  margin: 20px auto;
+}
+
+/* ── Executive Summary ── */
+.exec-summary {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin: 20px 0;
+  page-break-inside: avoid;
+}
+
+.exec-summary h3 {
+  margin-top: 0;
+  color: #b8860b;
+}
+
+/* ── Data highlight row ── */
+.highlight-row {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.highlight-item {
+  flex: 1;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.highlight-item .val {
+  font-size: 16pt;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.highlight-item .lbl {
+  font-size: 7.5pt;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* ── Section subtitle ── */
+.section-desc {
+  color: #64748b;
+  font-size: 9pt;
+  margin: 4px 0 12px 0;
+}
+
+/* ── Rating badge ── */
+.rating-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.rating-buy { background: #fef7ed; color: #b8860b; border: 1px solid #f0d78c; }
+.rating-hold { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+.rating-sell { background: #f0fdf4; color: #047857; border: 1px solid #bbf7d0; }
+
+/* ── Star rating ── */
+.stars { color: #b8860b; letter-spacing: 1px; }
+
+/* ── Risk severity indicators ── */
+.risk-high { color: #b91c1c; font-weight: 700; }
+.risk-med { color: #d97706; font-weight: 600; }
+.risk-low { color: #047857; font-weight: 600; }
+
+/* ── Operation plan table ── */
+.plan-table th { background: #1e293b; }
+.plan-table .plan-buy { background: #fef7ed !important; }
+.plan-table .plan-hold { background: #f8fafc !important; }
+.plan-table .plan-sell { background: #f0fdf4 !important; }
+
+/* ── Key monitoring list ── */
+.monitor-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.monitor-list li {
+  padding: 6px 0 6px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 9pt;
+  position: relative;
+}
+
+.monitor-list li::before {
+  content: "▸";
+  position: absolute;
+  left: 4px;
+  color: #b8860b;
+  font-size: 8pt;
+}
+
+/* ── Catalyst timeline ── */
+.catalyst-item {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 9pt;
+}
+
+.catalyst-date {
+  min-width: 70px;
+  color: #b8860b;
+  font-weight: 600;
+}
