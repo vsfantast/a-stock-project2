@@ -197,43 +197,122 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 
 对采集到的数据执行以下分析模块。
 
-**首先执行 M0：市场环境识别（V2.8 — 最高优先级）**
+**首先执行 M0：市场环境识别（V2.8.1 — 量化指标 + 3日防抖）**
+
+M0 用 **7 个量化指标** 打分，每项 0-2 分，总分 0-14 分映射到四模式。
+
+**数据源：** 腾讯行情 (全市场涨跌统计) + 自计算 (均线/轮动/量能)
 
 ```python
-def market_environment():
-    """判断当前行情模式，决定策略A/B"""
-    # 1. 涨停家数 (从东财或腾讯板块数据估算)
-    limit_up_count = get_limit_up_count()  # 涨停家数
+# ====== 指标定义 ======
+
+def m0_compute():
+    """返回 7 项指标原始值"""
+    metrics = {}
     
-    # 2. 连板最高度
-    max_continuous = get_max_continuous_board()  # 最高连板数
+    # I1: 涨停家数 (腾讯全市场筛选涨>9.8%的股票)
+    metrics['limit_up'] = count_stocks_pct_gt(9.8)
     
-    # 3. 涨跌比
-    advance_decline_ratio = get_advance_decline_ratio()
+    # I2: 连板最高度
+    metrics['max_continuous'] = get_max_continuous_board_days()
     
-    # 4. 大盘指数 vs MA20
-    index_vs_ma20 = (sh_index_close / sh_ma20 - 1) * 100
+    # I3: 涨跌比 (涨家数/跌家数)
+    up = count_stocks_pct_gt(0)
+    down = count_stocks_pct_lt(0)
+    metrics['ad_ratio'] = up / max(down, 1)
     
-    # 5. 板块轮动速度
-    rotation_speed = get_sector_rotation_speed()
+    # I4: 炸板率 (触碰涨停但未封住的/触碰涨停总数)
+    touched = count_stocks_touched_limit_up()
+    sealed = count_stocks_sealed_limit_up()
+    metrics['break_rate'] = (touched - sealed) / max(touched, 1)
     
-    # === 模式判定 ===
-    if limit_up_count >= 80 and max_continuous >= 5:
-        mode = "HOT"       # 情绪亢奋 → 策略A
-    elif limit_up_count <= 20 or advance_decline_ratio < 0.5:
-        mode = "COLD"      # 情绪冰点 → 策略B (等反转)
-    elif rotation_speed > 0.7:  # 每天换主线
-        mode = "FAST"      # 快速轮动 → 策略B (不适合追)
-    else:
-        mode = "NORMAL"    # 正常 → 策略A/B按个股属性
+    # I5: 全市场成交额 vs 20日均量
+    today_volume = get_total_market_volume()
+    avg_volume_20 = get_20day_avg_volume()
+    metrics['vol_ratio'] = today_volume / max(avg_volume_20, 1)
     
-    return {
-        "mode": mode,
-        "limit_up": limit_up_count,
-        "max_board": max_continuous,
-        "ad_ratio": advance_decline_ratio,
-        "rotation": rotation_speed,
-    }
+    # I6: 均线多头比例 (MA5>MA20的股票/全市场)
+    metrics['bull_align_pct'] = count_ma5_gt_ma20() / max(total_stocks, 1)
+    
+    # I7: 板块轮动速度 (今日TOP5 vs 昨日TOP5的重合度, 越低=轮动越快)
+    today_top5 = set(get_top5_sectors())
+    yesterday_top5 = set(get_top5_sectors(days_ago=1))
+    metrics['rotation'] = len(today_top5 & yesterday_top5) / 5  # 0-1, 1=不变
+    
+    return metrics
+
+
+# ====== 七项打分表 ======
+
+def m0_score(metrics):
+    """每项 0/1/2 分"""
+    scores = {}
+    
+    # I1: 涨停家数 → 多=亢奋
+    scores['limit_up'] = 2 if metrics['limit_up'] >= 80 else (1 if metrics['limit_up'] >= 30 else 0)
+    
+    # I2: 连板高度 → 高=情绪好
+    scores['max_cont'] = 2 if metrics['max_continuous'] >= 5 else (1 if metrics['max_continuous'] >= 2 else 0)
+    
+    # I3: 涨跌比 → 高=普涨
+    scores['ad'] = 2 if metrics['ad_ratio'] >= 2 else (1 if metrics['ad_ratio'] >= 1 else 0)
+    
+    # I4: 炸板率 → 高=危险信号(反向)
+    scores['break'] = 2 if metrics['break_rate'] <= 0.2 else (0 if metrics['break_rate'] >= 0.35 else 1)
+    
+    # I5: 成交额比 → 高=活跃
+    scores['vol'] = 2 if metrics['vol_ratio'] >= 1.2 else (1 if metrics['vol_ratio'] >= 0.8 else 0)
+    
+    # I6: 均线多头比例 → 高=趋势强
+    scores['bull'] = 2 if metrics['bull_align_pct'] >= 0.6 else (1 if metrics['bull_align_pct'] >= 0.4 else 0)
+    
+    # I7: 轮动速度 → 高=主线持续(好), 低=快速轮动
+    scores['rot'] = 2 if metrics['rotation'] >= 0.6 else (1 if metrics['rotation'] >= 0.3 else 0)
+    
+    return sum(scores.values()), scores
+
+
+# ====== 模式映射 (3日防抖) ======
+
+_history = []  # 最近3天的总分
+
+def m0_determine_mode(total_score):
+    """总分 → 模式，加3日平滑"""
+    global _history
+    _history.append(total_score)
+    if len(_history) > 3:
+        _history.pop(0)
+    
+    smoothed = sum(_history) / len(_history)  # 3日均值
+    
+    if smoothed >= 11:   return "HOT"
+    elif smoothed >= 7:  return "NORMAL"
+    elif smoothed >= 4:  return "FAST"
+    else:                return "COLD"
+
+
+# ====== 量化阈值总表 ======
+"""
+         I1涨停  I2连板  I3涨跌比  I4炸板率  I5量能   I6多头比  I7轮动   总分
+HOT      ≥80    ≥5     ≥2:1     ≤20%     ≥1.2x   ≥60%     ≥0.6     11-14
+NORMAL   30-80  2-5    1-2:1    20-35%   0.8-1.2x 40-60%  0.3-0.6   7-10
+FAST     10-30  1-2    0.5-1:1   >35%     0.6-0.8x 20-40%  <0.3      4-6
+COLD     <10    <1     <0.5:1    —        <0.6x    <20%     —         0-3
+"""
+```
+
+**防抖规则（防频繁切换）：**
+```
+升档（COLD→NORMAL→HOT）：连续2天满足目标档位即升
+降档（HOT→NORMAL→COLD）：连续3天不满足当前档位才降
+同档内 FAST↔NORMAL：允许1天切换（轮动本身变化快）
+```
+
+**M0 执行时机：**
+```
+09:32 开盘确认时跑一次 → 决定当日策略基调
+11:32 午间复盘时更新 → 盘中修正
+14:42 收盘时存档 → 为明日预判
 ```
 
 **市场环境判定速查：**
