@@ -308,6 +308,57 @@ COLD     <10    <1     <0.5:1    —        <0.6x    <20%     —         0-3
 同档内 FAST↔NORMAL：允许1天切换（轮动本身变化快）
 ```
 
+**情绪补丁 / 一票否决制（V2.8.2 新增）：**
+```python
+# 极端行情安全锁 — 防止"一只妖股拉高连板，其他全崩"的误判
+def safety_override(mode, metrics):
+    """满足任一条件 → 强制锁定COLD，禁止买入"""
+    
+    # 规则1: 涨跌比极端冰点
+    if metrics['ad_ratio'] < 0.25:  # 涨:跌 < 1:4
+        return "COLD", "涨跌比极端(<1:4)，全面冰点"
+    
+    # 规则2: 炸板率极高
+    if metrics['break_rate'] > 0.5:  # 一半以上炸板
+        return "COLD", "炸板率>50%，市场极度恐慌"
+    
+    # 规则3: 量能枯竭
+    if metrics['vol_ratio'] < 0.5:  # 成交量不到均值一半
+        return "COLD", "量能枯竭(<0.5x)，流动性危机"
+    
+    # 规则4: 指数破位 (上证跌破MA60)
+    if index_close < index_ma60 * 0.97:  # 偏离MA60超过3%
+        return "COLD", "指数破位MA60，系统性风险"
+    
+    # 规则5: 单向极端 — 跌停>50家 且 涨停<10家
+    if metrics['limit_up'] < 10 and metrics.get('limit_down', 0) > 50:
+        return "COLD", "跌停潮(>50)，流动性踩踏"
+    
+    return mode, None  # 无人反对，保持原模式
+```
+
+**I7 数据源修正：用申万二级行业代替概念板块（V2.8.2）：**
+```python
+# 旧方案（不可靠）: get_top5_sectors(type='concept')  # "小金属""稀土永磁"高度重叠
+# 新方案（可靠）: get_top5_sectors(type='sw_level2')  # 申万二级行业，边界清晰
+
+def get_top5_sectors_sw():
+    """用申万二级行业计算轮动，替代概念板块"""
+    # 拉东财行业板块 (m:90+t:2 即申万行业分类)
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    params = {"pn":"1","pz":"100","po":"1","fltt":"2","invt":"2",
+              "fs":"m:90+t:2","fields":"f2,f3,f14,f12"}
+    # f12=板块代码 f14=板块名称(如"半导体""小金属"等申万二级)
+    
+    # 计算5日平均涨幅排名TOP5
+    sectors = fetch_and_rank_by_5day_avg()
+    return [s['name'] for s in sectors[:5]]
+
+# 申万二级行业 ~130个 v.s. 概念板块 ~400个
+# 申万二级: "半导体" "小金属" "航空装备" — 边界清晰，不重叠
+# 概念板块: "成飞概念" "军工" "大飞机" — 高度重叠失真
+```
+
 **M0 执行时机：**
 ```
 09:32 开盘确认时跑一次 → 决定当日策略基调
