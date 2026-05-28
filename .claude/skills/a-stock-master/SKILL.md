@@ -50,7 +50,7 @@ triggers:
   - 深证
   - 创业板
   - 科创板
-version: 2.8.0
+version: 2.9.0
 tags: [A股, 股票, 全维分析, 14模块, 自动作战, 飞书推送]
 ---
 
@@ -92,11 +92,12 @@ tags: [A股, 股票, 全维分析, 14模块, 自动作战, 飞书推送]
 ## 技能架构
 
 ```
-a-stock-master V2.8
+a-stock-master V2.9
 ├── 顶层：市场环境识别 M0（行情模式判断 → 决定用哪种策略）
 │   ├── 牛市/震荡/熊市 · 情绪温度(涨停家数/炸板率) · 波动率基准(ATR)
+│   ├── ✨东财实时数据（V2.9）：行业板块+概念板块+资金流向+龙虎榜+融资融券
 │   └── → 输出：当前适合 策略A(短线爆发) 还是 策略B(趋势波段)
-├── 数据层 → a-stock-data(28端点) + global-stock-data(18端点)，直连HTTP
+├── 数据层 → a-stock-data(28) + global-stock-data(18) + 东财实时(jsonblob)，直连HTTP
 ├── 外部分析引擎（V2.7 融合）
 │   ├── augur → 18位投资大师共识分析（巴菲特/芒格/索罗斯/林奇...）
 │   ├── TradingAgents-astock → 7位分析师A股辩论（政策/游资/解禁/基本面）
@@ -468,6 +469,61 @@ M0: 判断市场环境 (HOT/NORMAL/FAST/COLD)
   ↓
 输出：策略模式 + 入场方案 + 风控参数
 ```
+
+#### 东财实时数据读取（V2.9 新增）
+
+```python
+import json, os
+
+def eastmoney_realtime():
+    """读取Mac推送的东财实时数据（jsonblob缓存）"""
+    cache = "/home/ubuntu/.eastmoney_cache/latest.json"
+    if os.path.exists(cache):
+        with open(cache) as f:
+            return json.load(f)
+    return None
+
+def eastmoney_sectors():
+    """返回: {industry: [...], concept: [...], updated: str}"""
+    d = eastmoney_realtime()
+    if not d:
+        return None
+    
+    # 解析行业板块
+    ind_raw = json.loads(d['industry']) if isinstance(d['industry'], str) else d['industry']
+    concept_raw = json.loads(d['concept']) if isinstance(d['concept'], str) else d['concept']
+    
+    industries = []
+    for item in ind_raw.get('data', {}).get('diff', []):
+        industries.append({
+            'name': item.get('f14', ''),
+            'change_pct': float(item.get('f3', 0)),
+            'main_flow_yi': float(item.get('f62', 0)) / 1e8,
+        })
+    
+    concepts = []
+    for item in concept_raw.get('data', {}).get('diff', []):
+        concepts.append({
+            'name': item.get('f14', ''),
+            'change_pct': float(item.get('f3', 0)),
+            'main_flow_yi': float(item.get('f62', 0)) / 1e8,
+        })
+    
+    return {
+        'industries': industries,
+        'concepts': concepts,
+        'updated': d.get('updated', ''),
+    }
+
+# 用法
+sectors = eastmoney_sectors()
+if sectors:
+    print(f"更新时间: {sectors['updated']}")
+    print(f"行业TOP3: {[s['name'] for s in sectors['industries'][:3]]}")
+    print(f"概念TOP3: {[s['name'] for s in sectors['concepts'][:3]]}")
+```
+
+**数据时效：** 交易时段每2分钟更新一次，非交易时段不更新。
 
 #### 模块A0：美股映射分析（V2.2 新增 — 优先级次高）
 
@@ -1059,7 +1115,8 @@ python3 /tmp/TradingAgents-astock/main.py --symbol <CODE>
 
 ## 版本历史
 
-- V2.8 (2026-05-27)：**架构重构**：新增M0市场环境识别模块(HOT/NORMAL/FAST/COLD四模式)；策略解耦A(短线1+1确认)/B(趋势三批+ATR)；ATR动态止损替换固定百分比；简化监控流程(P0→P3)
+- V2.9 (2026-05-28)：**东财实时数据打通**：jsonblob中继(零成本)→M0实时量化+板块主力资金+概念热度；交易时段自动拉取；数据时效2分钟
+- V2.8 (2026-05-27)：**架构重构**：新增M0市场环境识别模块(HOT/NORMAL/FAST/COLD四模式)；策略解耦A(短线1+1确认)/B(趋势三批+ATR)；ATR动态止损替换固定百分比
 - V2.7 (2026-05-26)：融合外部引擎 augur(18大师共识) + TradingAgents-astock(7分析师A股辩论) + financial-analyst(14+API多源分析)；优化PDF输出
 - V2.6 (2026-05-26)：新增主动机会扫描(C6：持仓实时监控+候选池追踪+异动检测)、三级入场策略(试探/确认/追击)、升级买入逻辑(守株待兔→主动出击)
 - V2.5 (2026-05-25)：新增杠杆资金面(C5：融资余额趋势+买入偿还比+融券压力+杠杆率+杠杆vs北向一致性检查)
