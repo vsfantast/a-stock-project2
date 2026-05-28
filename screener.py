@@ -6,11 +6,55 @@ import requests, json, sys
 UA = 'Mozilla/5.0'
 
 # ====== 配置 ======
-MAX_PRICE = None  # 自动根据可用资金计算
 MIN_TURNOVER = 1.0  # 最小换手率%
-MAX_PE = 200  # 最大PE（纯题材过滤）
-MIN_RSI = 25  # RSI下限
-MAX_RSI = 80  # RSI上限
+MIN_RSI = 25      # RSI下限
+MAX_RSI = 80      # RSI上限
+
+# ====== 市值配置（V3.2） ======
+MCAP_LARGE   = 500   # 大盘股（亿）
+MCAP_SMALL   = 100   # 小盘股（亿）
+
+# ====== 板块别名映射（V3.2 — 解决东财行业名与候选池名不匹配） ======
+SECTOR_ALIASES = {
+    "半导体":   "半导体/封测",
+    "封测":     "半导体/封测",
+    "集成电路": "半导体/封测",
+    "芯片":     "半导体/封测",
+    "分立器件": "半导体/封测",
+    "被动元件": "电子/被动元件",
+    "MLCC":    "电子/被动元件",
+    "锂":       "新能源/锂电",
+    "能源金属": "新能源/锂电",
+    "电池":     "新能源/锂电",
+    "光伏":     "光伏/储能",
+    "储能":     "光伏/储能",
+    "钨":       "有色金属",
+    "稀土":     "有色金属",
+    "铜":       "有色金属",
+    "锡":       "有色金属",
+    "小金属":   "有色金属",
+    "玻纤":     "化工/玻纤",
+    "磨具":     "化工/玻纤",
+    "有机硅":   "化工/玻纤",
+    "新材料":   "新材料",
+    "军工":     "军工/高端制造",
+    "航空":     "军工/高端制造",
+    "机器人":   "机器人/自动化",
+    "自动化":   "机器人/自动化",
+    "汽车":     "汽车/零部件",
+    "医药":     "医药",
+    "白酒":     "消费/白酒",
+    "电力":     "电力/能源",
+    "通信":     "通信/5G",
+    "5G":       "通信/5G",
+}
+
+def match_sector(eastmoney_sector_name):
+    """东财板块名 → 候选池名"""
+    for key, target in SECTOR_ALIASES.items():
+        if key in eastmoney_sector_name:
+            return target
+    return None
 CASH = 2800  # 可用资金（可手动调整）
 
 # ====== 候选池（V3.1 扩展至 65 支，覆盖 14 个行业） ======
@@ -176,7 +220,14 @@ def screen():
     passed = [total, 0, 0, 0, 0, 0, 0, 0]
 
     for sector, stocks in UNIVERSE.items():
-        in_main = any(h in sector for h in hot_names)
+        # V3.2: 板块双向匹配
+        in_main = False
+        for h in hot_names:
+            matched = match_sector(h)
+            if matched and matched == sector:
+                in_main = True; break
+            if h in sector or any(kw in h for kw in sector.split('/')):
+                in_main = True; break
 
         for code, name in stocks:
             q = get_quote(code)
@@ -220,7 +271,10 @@ def screen():
 
             s_score = w['sector'] if in_main else 0
 
-            score = t_score + r_score + s_score
+            # 市值加分（V3.2）：大盘+1 小盘+1（不同风格各有优势）
+            m_score = 1 if q['mcap'] > MCAP_LARGE else (1 if q['mcap'] < MCAP_SMALL else 0)
+
+            score = t_score + r_score + s_score + m_score
             score += 1 if q['turnover'] > 3 else 0  # 活跃加分
 
             results.append({
