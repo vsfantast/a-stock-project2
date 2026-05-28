@@ -233,9 +233,9 @@ def screen():
             q = get_quote(code)
             if not q: continue; passed[1] += 1
 
-            # L2: 价格 — 1手≤总资产×0.6（B模式S1+S2预算）
+            # L2: 价格 — 1手≤10000元（好票不封顶，资金可追加）
             cost = q['price'] * 100
-            if cost > CASH * 2: continue; passed[2] += 1
+            if cost > 10000: continue; passed[2] += 1
 
             # L3: 流动性
             if q['turnover'] < MIN_TURNOVER: continue; passed[3] += 1
