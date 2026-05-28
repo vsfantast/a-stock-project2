@@ -251,9 +251,10 @@ def screen():
             k = get_kline(code)
             if not k: continue; passed[6] += 1
 
-            # L7: 趋势+RSI
+            # L7: 趋势+RSI（HOT模式放宽RSI上限到90）
+            rsi_max = 90 if m0 == "HOT" else (85 if m0 == "NORMAL" else MAX_RSI)
             if k['trend'] == '空头': continue
-            if k['rsi'] < MIN_RSI or k['rsi'] > MAX_RSI: continue
+            if k['rsi'] < MIN_RSI or k['rsi'] > rsi_max: continue
             passed[7] += 1
 
             # === M0 动态评分 ===
@@ -277,12 +278,18 @@ def screen():
             score = t_score + r_score + s_score + m_score
             score += 1 if q['turnover'] > 3 else 0  # 活跃加分
 
+            # V3.2: A/B 预分类
+            if q['turnover'] > 12 and abs(q['chg']) > 3 and k['rsi'] > 60 and in_main:
+                strat = 'A'
+            else:
+                strat = 'B'
+
             results.append({
                 'code':code,'name':name,'price':q['price'],'chg':q['chg'],
                 'pe':q['pe'],'turnover':q['turnover'],'mcap':q['mcap'],
                 'trend':k['trend'],'rsi':k['rsi'],'atr_pct':k['atr_pct'],
                 'cost':cost,'sector':sector,'main':in_main,
-                'score':score, 'm0': m0
+                'score':score, 'm0': m0, 'strat': strat
             })
 
     results.sort(key=lambda x: x['score'], reverse=True)
@@ -299,4 +306,4 @@ if __name__ == "__main__":
 
     for i, r in enumerate(results[:10]):
         main_tag = '★' if r['main'] else ' '
-        print(f"#{i+1} {r['name']}({r['code']}) {r['price']:.2f}元 {r['chg']:+.1f}% {r['trend']} RSI{r['rsi']:.0f} PE{r['pe']:.0f} {r['sector']} {main_tag} 评分:{r['score']}/9")
+        print(f"#{i+1} {r['name']}({r['code']}) {r['price']:.2f}元 {r['chg']:+.1f}% {r['trend']} RSI{r['rsi']:.0f} PE{r['pe']:.0f} [{r['strat']}] {r['sector']} {main_tag} {r['score']}分")
