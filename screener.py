@@ -155,7 +155,7 @@ def get_kline(code):
 def get_hot_sectors():
     """从东财实时数据获取今日主线板块"""
     try:
-        r = requests.get("https://jsonblob.com/api/jsonBlob/019e6c05-9fb5-784c-b0b6-1c2f159a84ee", headers={'User-Agent': UA}, timeout=5)
+        r = requests.get("https://jsonblob.com/api/jsonBlob/019e7703-88cd-7afc-9d79-696ad1993c7a", headers={'User-Agent': UA}, timeout=5)
         d = r.json()
         ind = json.loads(d['industry']) if isinstance(d['industry'],str) else d['industry']
         con = json.loads(d['concept']) if isinstance(d['concept'],str) else d['concept']
@@ -204,7 +204,7 @@ def screen():
 
     # 重新获取实际涨幅
     try:
-        r_raw = requests.get("https://jsonblob.com/api/jsonBlob/019e6c05-9fb5-784c-b0b6-1c2f159a84ee", headers={'User-Agent': UA}, timeout=5)
+        r_raw = requests.get("https://jsonblob.com/api/jsonBlob/019e7703-88cd-7afc-9d79-696ad1993c7a", headers={'User-Agent': UA}, timeout=5)
         d_raw = r_raw.json()
         ind_raw = json.loads(d_raw['industry']) if isinstance(d_raw['industry'],str) else d_raw['industry']
         hot_list = [(i['f14'], float(i['f3'])) for i in ind_raw['data']['diff'][:10]]

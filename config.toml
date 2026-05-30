@@ -36,7 +36,7 @@ enable_feishu_card = false
 allow_from = "*"
 reaction_emoji = "none"
 done_emoji = "none"
-progress_style = "compact"
+progress_style = "legacy"
 
 # ====== 企业微信平台（直连，无需隧道！）======
 [[projects.platforms]]

@@ -1,6 +1,6 @@
 #!/bin/bash
 # 监测东财数据是否断流：超过5分钟未更新 → 飞书告警
-BLOB="https://jsonblob.com/api/jsonBlob/019e6c05-9fb5-784c-b0b6-1c2f159a84ee"
+BLOB="https://jsonblob.com/api/jsonBlob/019e7703-88cd-7afc-9d79-696ad1993c7a"
 ALERT_FILE="/tmp/.eastmoney_alerted"
 WEBHOOK="https://open.feishu.cn/open-apis/bot/v2/hook/f281cf20-e638-494c-b1d7-29742c3fa8b2"
 

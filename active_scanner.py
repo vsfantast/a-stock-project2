@@ -14,6 +14,8 @@ POSITIONS = {
                "stop": 50.50, "target": 58.00, "ma5_alert": True},
     "002340": {"name": "格林美", "cost": 8.229, "shares": 200,
                "stop": 7.52, "target": 9.80, "ma5_alert": True},
+    "002079": {"name": "苏州固锝", "cost": 12.876, "shares": 100,
+               "stop": 11.63, "target": 14.16, "ma5_alert": True},
 }
 
 # 候选池

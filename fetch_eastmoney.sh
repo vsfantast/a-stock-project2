@@ -1,6 +1,6 @@
 #!/bin/bash
 # 交易时段自动拉取东财数据到本地缓存
-BLOB_URL="https://jsonblob.com/api/jsonBlob/019e6c05-9fb5-784c-b0b6-1c2f159a84ee"
+BLOB_URL="https://jsonblob.com/api/jsonBlob/019e7703-88cd-7afc-9d79-696ad1993c7a"
 CACHE_FILE="/home/ubuntu/.eastmoney_cache/latest.json"
 
 while true; do
